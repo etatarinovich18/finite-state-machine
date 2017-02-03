@@ -9,6 +9,10 @@ class FSM {
         this.states = this.config.states;
 
         this.state = this.initial;
+
+        this.index = 0;
+        this.arrayOfStates = [];
+        this.arrayOfStates[this.index] = this.state;
     }
 
     /**
@@ -26,6 +30,7 @@ class FSM {
     changeState(state) {
         if (state in this.states) {
             this.state = state;
+            this.arrayOfStates[++this.index] = this.state;
         } else {
             throw new Error();
         }
@@ -36,10 +41,11 @@ class FSM {
      * @param event
      */
     trigger(event) {
-        var state = this.getState();
+        var state = this.state;
 
         if (this.states[state].transitions[event] in this.states) {
             this.state = this.states[state].transitions[event];
+            this.arrayOfStates[++this.index] = this.state;
         } else {
             throw new Error();
         }
@@ -82,19 +88,37 @@ class FSM {
      * Returns false if undo is not available.
      * @returns {Boolean}
      */
-    undo() {}
+    undo() {
+        if (this.state == this.initial) {
+            return false;
+        } else {
+            this.state = this.arrayOfStates[--this.index];
+            return true;
+        }
+    }
 
     /**
      * Goes redo to state.
      * Returns false if redo is not available.
      * @returns {Boolean}
      */
-    redo() {}
+    redo() {
+        var lengthArr = this.arrayOfStates.length;
+        if (this.state == this.arrayOfStates[lengthArr - 1]) {
+            return false;
+        } else {
+            this.state = this.arrayOfStates[++this.index];
+            return true;
+        }
+    }
 
     /**
      * Clears transition history
      */
-    clearHistory() {}
+    clearHistory() {
+        this.state = this.initial;
+        this.arrayOfStates.length = 1;
+    }
 }
 
 module.exports = FSM;
