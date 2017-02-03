@@ -5,8 +5,10 @@ class FSM {
      */
     constructor(config) {
         this.config = config;
+        this.initial = this.config.initial;
         this.states = this.config.states;
-        this.state = this.config.initial;
+
+        this.state = this.initial;
     }
 
     /**
@@ -46,7 +48,9 @@ class FSM {
     /**
      * Resets FSM state to initial.
      */
-    reset() {}
+    reset() {
+        this.state = this.initial; 
+    }
 
     /**
      * Returns an array of states for which there are specified event transition rules.
@@ -54,7 +58,24 @@ class FSM {
      * @param event
      * @returns {Array}
      */
-    getStates(event) {}
+    getStates(event) {
+        var arrayOfStates = []; 
+
+        if (arguments.length == 0) { 
+            arrayOfStates = Object.keys(this.states); 
+        } else { 
+            var i = 0; 
+            
+            for (var key in this.states) { 
+                if (event in this.states[key].transitions) { 
+                    arrayOfStates[i] = key; 
+                i++; 
+                } 
+            } 
+        } 
+
+        return arrayOfStates;
+    }
 
     /**
      * Goes back to previous state.
